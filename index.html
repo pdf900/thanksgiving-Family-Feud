@@ -1,72 +1,629 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Thanksgiving Family Feud</title><style>
 :root{font-family:system-ui,Segoe UI,Arial,sans-serif;color:#f7f3df;background:#08152c}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#244d8b,#08152c 70%)}button,input,textarea,select{font:inherit}button{cursor:pointer;background:#efc35d;color:#14233b;border:0;border-radius:9px;padding:10px 13px;font-weight:750}button:hover{filter:brightness(1.09)}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#315a90;color:white}.danger{background:#b9283b;color:white}.wrap{max-width:1440px;margin:auto;padding:18px}.header{text-align:center;margin:5px 0 16px}.header h1{margin:0;font-size:clamp(25px,4vw,48px);color:#ffd578;text-shadow:0 3px #8d5d17}.subtitle{color:#c6d7f1;font-size:13px}.layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,1fr);gap:16px}.panel{background:#12294b;border:2px solid #456ca1;border-radius:16px;padding:16px;box-shadow:0 8px 30px #0005}.board{background:linear-gradient(145deg,#204e9b,#102e69);border:8px ridge #e4b650;border-radius:18px;padding:15px;min-height:480px}.question{text-align:center;background:#071d49;border:2px solid #e2b451;border-radius:12px;padding:16px;margin-bottom:15px;font-size:clamp(18px,2.1vw,27px);font-weight:800;min-height:100px;display:grid;place-items:center}.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.answer{display:flex;align-items:center;min-height:57px;background:#0d326f;border:2px solid #d2a64c;border-radius:9px;overflow:hidden;font-size:clamp(13px,1.35vw,20px);font-weight:800}.answer .num{background:#e4b85e;color:#112650;padding:14px 16px;min-width:50px;text-align:center}.answer .txt{flex:1;padding:8px 10px}.answer .pts{background:#e4b85e;color:#112650;padding:14px;min-width:55px;text-align:center}.answer.hidden .txt{color:#7ea6df;text-align:center}.answer.hidden .pts{visibility:hidden}.scorebar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.team{background:#061a3e;border:2px solid #d4ac5d;border-radius:10px;padding:12px;text-align:center;font-weight:800}.team strong{display:block;font-size:40px;color:#ffd36d}.strikes{text-align:center;color:#f24d62;font-size:40px;letter-spacing:10px;min-height:55px;font-weight:900}.controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.controls button{flex:1 1 auto}label{display:block;font-size:13px;color:#c5d8f5;margin:8px 0 5px}input,textarea,select{width:100%;background:#071b39;color:white;border:1px solid #6485b0;border-radius:8px;padding:10px}textarea{min-height:120px;resize:vertical}.small{font-size:12px;color:#b6c8e1}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.pill{background:#345783;border-radius:20px;padding:5px 9px;font-size:12px}.divider{height:1px;background:#44648b;margin:15px 0}.editrow{display:grid;grid-template-columns:1fr 85px 40px;gap:5px;margin-bottom:5px}.editrow button{padding:5px}.notice{color:#ffe2a4}.timer{font-size:28px;font-weight:900;color:#ffd36d;text-align:center}.survey{white-space:pre-wrap}.hiddenui{display:none!important}@media(max-width:950px){.layout{grid-template-columns:1fr}.board{min-height:380px}}@media(max-width:520px){.answers{grid-template-columns:1fr}.answer{min-height:45px}.answer .num,.answer .pts{padding:10px}.wrap{padding:8px}.panel{padding:10px}}
-.fastcard{background:#071d49;border:2px solid #e2b451;border-radius:12px;padding:14px;margin:10px 0}.fastline{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#153b79;padding:10px;margin:6px 0;border-radius:7px}.fastline b{color:#ffd578}.fastbig{text-align:center;color:#ffd578;font-size:clamp(25px,4vw,45px);font-weight:900}.fasttotal{text-align:center;font-size:28px;font-weight:900;color:#ffd578}.fastcontrols button{margin:3px}.fastinput{max-width:95px}.fastwinner{font-size:26px;color:#ffd578;text-align:center;font-weight:900}.coinface{margin:25px auto;width:clamp(110px,20vw,220px);aspect-ratio:1;border-radius:50%;border:8px double #fff0a3;background:radial-gradient(circle at 35% 25%,#fff1a5,#d69a24 75%);color:#503000;display:grid;place-items:center;font-size:clamp(24px,5vw,52px);font-weight:900;box-shadow:0 8px 25px #0008}.coinspin{animation:coinspin .22s linear infinite}@keyframes coinspin{to{transform:rotateY(360deg)}}@media(prefers-reduced-motion:reduce){.coinspin{animation:none}}</style></head><body><div class="wrap"><header class="header"><h1>THANKSGIVING FAMILY FEUD</h1><div class="subtitle">Classic game-night edition · Host dashboard + optional TV audience window</div></header><div class="layout"><section class="panel"><div id="boardMount"></div><div class="controls"><button onclick="openAudience()">📺 Open TV / Player Screen</button><button class="secondary" onclick="toggleSound()" id="soundBtn">🔊 Sound on</button><button class="secondary" onclick="fullScreen()">⛶ Fullscreen</button></div><div class="small">Tip: Open the player screen, drag that window to your TV, then fullscreen it. The host keeps this dashboard with the answers.</div></section><section class="panel"><h2 style="margin-top:0">🎙️ Host controls</h2><h3>🪙 Opening coin toss</h3><div id="coinHost"></div><label>Choose a question (50 included)</label><select id="selector" onchange="selectQuestion(Number(this.value))"></select><div class="row"><button class="secondary" onclick="stepQuestion(-1)">← Previous</button><button class="secondary" onclick="stepQuestion(1)">Next →</button></div><p class="small" id="category"></p><div class="controls"><button onclick="award('A')">🏆 Award revealed points to Team A</button><button onclick="award('B')">🏆 Award revealed points to Team B</button></div><div class="controls"><button class="danger" onclick="strike()">✕ Strike</button><button class="secondary" onclick="clearStrikes()">Clear strikes</button><button class="secondary" onclick="resetRound()">Reset round</button></div><div class="row"><div><label>Team A name</label><input id="teamA" oninput="state.teamA=this.value;sync()"></div><div><label>Team B name</label><input id="teamB" oninput="state.teamB=this.value;sync()"></div></div><div class="row"><div><label>Adjust Team A score</label><input id="scoreA" type="number" onchange="state.scoreA=Number(this.value)||0;sync()"></div><div><label>Adjust Team B score</label><input id="scoreB" type="number" onchange="state.scoreB=Number(this.value)||0;sync()"></div></div><div class="divider"></div><h3>🏆 Fast Money finale</h3><p class="small">Two players, five questions each, 20 and 25 seconds. Select the team to receive the bonus points. Edit answers and points as they play.</p><div class="controls"><button onclick="startFastMoney()">🏆 Start Fast Money</button><button class="secondary" onclick="endFastMoney()">Return to regular game</button></div><div id="fastHost" class="hiddenui"></div><div class="divider"></div><h3>Answer reveal controls <span class="pill">Host only</span></h3><div id="revealButtons"></div><div class="divider"></div><h3>Edit selected question</h3><label>Question</label><textarea id="editQuestion" rows="2"></textarea><label>Category</label><select id="editCategory"><option>General</option><option>Family survey</option></select><label>Answers and points</label><div id="editAnswers"></div><div class="controls"><button class="secondary" onclick="addAnswer()">+ Add answer</button><button onclick="saveQuestion()">Save question</button></div><p class="small">Family survey questions start empty. Enter real responses and assign scores after collecting votes. A blank answer is never shown.</p><div class="divider"></div><h3>⏱️ Round timer</h3><div class="timer" id="timer">30</div><div class="row"><button class="secondary" onclick="startTimer(30)">30 sec</button><button class="secondary" onclick="startTimer(60)">60 sec</button><button class="secondary" onclick="stopTimer()">Stop</button></div><div class="divider"></div><h3>Question bank & backup</h3><div class="controls"><button class="secondary" onclick="exportQuestions()">Export JSON backup</button><button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" class="hiddenui" onchange="importQuestions(event)"></div><div class="controls"><button class="secondary" onclick="printSurvey()">Print 10-question family survey</button><button class="secondary" onclick="printKey()">Print host answer key</button></div><div class="controls"><button class="danger" onclick="resetScores()">Reset scores</button><button class="danger" onclick="restoreDefaults()">Restore all 50 defaults</button></div><p class="small">Auto-saves locally in this browser. Export a backup after editing. General-question rankings are fictional game data, not a real poll.</p></section></div></div><script>
-const DEFAULT_QUESTIONS=[{"id": 1, "category": "General", "question": "Name something people look forward to at Thanksgiving", "answers": [{"text": "Turkey", "points": 34}, {"text": "Family", "points": 25}, {"text": "Pie", "points": 17}, {"text": "Football", "points": 11}, {"text": "Time off", "points": 8}, {"text": "Stuffing", "points": 5}]}, {"id": 2, "category": "General", "question": "Name a Thanksgiving side dish", "answers": [{"text": "Mashed potatoes", "points": 34}, {"text": "Stuffing", "points": 25}, {"text": "Mac and cheese", "points": 17}, {"text": "Green beans", "points": 11}, {"text": "Sweet potatoes", "points": 8}, {"text": "Corn", "points": 5}]}, {"id": 3, "category": "General", "question": "Name something that can go wrong cooking Thanksgiving dinner", "answers": [{"text": "Burned turkey", "points": 34}, {"text": "Late dinner", "points": 25}, {"text": "Forgot ingredient", "points": 17}, {"text": "Oven breaks", "points": 11}, {"text": "Dry turkey", "points": 8}, {"text": "Spilled food", "points": 5}]}, {"id": 4, "category": "General", "question": "Name a Thanksgiving dessert", "answers": [{"text": "Pumpkin pie", "points": 34}, {"text": "Pecan pie", "points": 25}, {"text": "Apple pie", "points": 17}, {"text": "Cheesecake", "points": 11}, {"text": "Cookies", "points": 8}, {"text": "Sweet potato pie", "points": 5}]}, {"id": 5, "category": "General", "question": "Name something people do after Thanksgiving dinner", "answers": [{"text": "Nap", "points": 34}, {"text": "Watch football", "points": 25}, {"text": "Clean dishes", "points": 17}, {"text": "Eat dessert", "points": 11}, {"text": "Go for a walk", "points": 8}, {"text": "Shop", "points": 5}]}, {"id": 6, "category": "General", "question": "Name something you might forget to buy for Thanksgiving", "answers": [{"text": "Butter", "points": 34}, {"text": "Rolls", "points": 25}, {"text": "Cranberry sauce", "points": 17}, {"text": "Ice", "points": 11}, {"text": "Gravy", "points": 8}, {"text": "Napkins", "points": 5}]}, {"id": 7, "category": "General", "question": "Name a reason someone arrives late to dinner", "answers": [{"text": "Traffic", "points": 34}, {"text": "Overslept", "points": 25}, {"text": "Cooking delay", "points": 17}, {"text": "Work", "points": 11}, {"text": "Lost keys", "points": 8}, {"text": "Wrong directions", "points": 5}]}, {"id": 8, "category": "General", "question": "Name something people argue about at a family gathering", "answers": [{"text": "Politics", "points": 34}, {"text": "Sports", "points": 25}, {"text": "Who cooks", "points": 17}, {"text": "Money", "points": 11}, {"text": "Games", "points": 8}, {"text": "Seating", "points": 5}]}, {"id": 9, "category": "General", "question": "Name a food people put gravy on", "answers": [{"text": "Mashed potatoes", "points": 34}, {"text": "Turkey", "points": 25}, {"text": "Stuffing", "points": 17}, {"text": "Biscuits", "points": 11}, {"text": "Rice", "points": 8}, {"text": "Rolls", "points": 5}]}, {"id": 10, "category": "General", "question": "Name a Thanksgiving decoration", "answers": [{"text": "Pumpkin", "points": 34}, {"text": "Turkey figure", "points": 25}, {"text": "Fall leaves", "points": 17}, {"text": "Cornucopia", "points": 11}, {"text": "Candles", "points": 8}, {"text": "Wreath", "points": 5}]}, {"id": 11, "category": "General", "question": "Name a food that is better as leftovers", "answers": [{"text": "Pizza", "points": 34}, {"text": "Turkey", "points": 25}, {"text": "Lasagna", "points": 17}, {"text": "Stuffing", "points": 11}, {"text": "Chili", "points": 8}, {"text": "Mac and cheese", "points": 5}]}, {"id": 12, "category": "General", "question": "Name something you find in a messy kitchen", "answers": [{"text": "Dirty dishes", "points": 34}, {"text": "Crumbs", "points": 25}, {"text": "Trash", "points": 17}, {"text": "Spills", "points": 11}, {"text": "Pots", "points": 8}, {"text": "Food scraps", "points": 5}]}, {"id": 13, "category": "General", "question": "Name a reason someone might leave a party early", "answers": [{"text": "Tired", "points": 34}, {"text": "Work tomorrow", "points": 25}, {"text": "Kids bedtime", "points": 17}, {"text": "Long drive", "points": 11}, {"text": "Not feeling well", "points": 8}, {"text": "Pet at home", "points": 5}]}, {"id": 14, "category": "General", "question": "Name something people do while watching football", "answers": [{"text": "Cheer", "points": 34}, {"text": "Snack", "points": 25}, {"text": "Yell at TV", "points": 17}, {"text": "Check phone", "points": 11}, {"text": "Nap", "points": 8}, {"text": "Talk", "points": 5}]}, {"id": 15, "category": "General", "question": "Name something you bring to a potluck", "answers": [{"text": "Casserole", "points": 34}, {"text": "Dessert", "points": 25}, {"text": "Drinks", "points": 17}, {"text": "Salad", "points": 11}, {"text": "Chips", "points": 8}, {"text": "Bread", "points": 5}]}, {"id": 16, "category": "General", "question": "Name something people lose around the house", "answers": [{"text": "Keys", "points": 34}, {"text": "Phone", "points": 25}, {"text": "Remote", "points": 17}, {"text": "Glasses", "points": 11}, {"text": "Wallet", "points": 8}, {"text": "Socks", "points": 5}]}, {"id": 17, "category": "General", "question": "Name something you do when guests are coming over", "answers": [{"text": "Clean", "points": 34}, {"text": "Cook", "points": 25}, {"text": "Set table", "points": 17}, {"text": "Hide clutter", "points": 11}, {"text": "Light candles", "points": 8}, {"text": "Vacuum", "points": 5}]}, {"id": 18, "category": "General", "question": "Name a food kids are picky about", "answers": [{"text": "Broccoli", "points": 34}, {"text": "Brussels sprouts", "points": 25}, {"text": "Fish", "points": 17}, {"text": "Mushrooms", "points": 11}, {"text": "Onions", "points": 8}, {"text": "Spinach", "points": 5}]}, {"id": 19, "category": "General", "question": "Name something you might find in a refrigerator", "answers": [{"text": "Milk", "points": 34}, {"text": "Eggs", "points": 25}, {"text": "Leftovers", "points": 17}, {"text": "Cheese", "points": 11}, {"text": "Vegetables", "points": 8}, {"text": "Ketchup", "points": 5}]}, {"id": 20, "category": "General", "question": "Name a reason a family photo takes too long", "answers": [{"text": "Someone blinking", "points": 34}, {"text": "Kids moving", "points": 25}, {"text": "Missing person", "points": 17}, {"text": "Bad lighting", "points": 11}, {"text": "Phone trouble", "points": 8}, {"text": "Too many retakes", "points": 5}]}, {"id": 21, "category": "General", "question": "Name something you might do on a rainy holiday", "answers": [{"text": "Watch movies", "points": 34}, {"text": "Play games", "points": 25}, {"text": "Read", "points": 17}, {"text": "Cook", "points": 11}, {"text": "Nap", "points": 8}, {"text": "Craft", "points": 5}]}, {"id": 22, "category": "General", "question": "Name a popular board game", "answers": [{"text": "Monopoly", "points": 34}, {"text": "Uno", "points": 25}, {"text": "Scrabble", "points": 17}, {"text": "Clue", "points": 11}, {"text": "Sorry!", "points": 8}, {"text": "Chess", "points": 5}]}, {"id": 23, "category": "General", "question": "Name something people say when they taste great food", "answers": [{"text": "Delicious", "points": 34}, {"text": "Wow", "points": 25}, {"text": "So good", "points": 17}, {"text": "Who made this?", "points": 11}, {"text": "Amazing", "points": 8}, {"text": "More please", "points": 5}]}, {"id": 24, "category": "General", "question": "Name a place people go on a long weekend", "answers": [{"text": "Beach", "points": 34}, {"text": "Mountains", "points": 25}, {"text": "Family house", "points": 17}, {"text": "Cabin", "points": 11}, {"text": "City trip", "points": 8}, {"text": "Lake", "points": 5}]}, {"id": 25, "category": "General", "question": "Name a chore nobody volunteers to do", "answers": [{"text": "Dishes", "points": 34}, {"text": "Clean bathroom", "points": 25}, {"text": "Take out trash", "points": 17}, {"text": "Vacuum", "points": 11}, {"text": "Laundry", "points": 8}, {"text": "Mop", "points": 5}]}, {"id": 26, "category": "General", "question": "Name something you might find on a dining table", "answers": [{"text": "Plates", "points": 34}, {"text": "Forks", "points": 25}, {"text": "Napkins", "points": 17}, {"text": "Centerpiece", "points": 11}, {"text": "Glasses", "points": 8}, {"text": "Salt", "points": 5}]}, {"id": 27, "category": "General", "question": "Name something people do when the Wi-Fi stops working", "answers": [{"text": "Restart router", "points": 34}, {"text": "Complain", "points": 25}, {"text": "Check phone", "points": 17}, {"text": "Call provider", "points": 11}, {"text": "Wait", "points": 8}, {"text": "Use data", "points": 5}]}, {"id": 28, "category": "General", "question": "Name something that makes a road trip uncomfortable", "answers": [{"text": "Traffic", "points": 34}, {"text": "Cramped seats", "points": 25}, {"text": "Bad weather", "points": 17}, {"text": "No bathroom", "points": 11}, {"text": "Car sickness", "points": 8}, {"text": "Loud music", "points": 5}]}, {"id": 29, "category": "General", "question": "Name something a dog might steal from the table", "answers": [{"text": "Turkey", "points": 34}, {"text": "Bread", "points": 25}, {"text": "Ham", "points": 17}, {"text": "Cookie", "points": 11}, {"text": "Chicken", "points": 8}, {"text": "Cheese", "points": 5}]}, {"id": 30, "category": "General", "question": "Name a reason someone might burn food", "answers": [{"text": "Distracted", "points": 34}, {"text": "Wrong temperature", "points": 25}, {"text": "Forgot timer", "points": 17}, {"text": "Phone call", "points": 11}, {"text": "Too much heat", "points": 8}, {"text": "Fell asleep", "points": 5}]}, {"id": 31, "category": "General", "question": "Name something people buy on Black Friday", "answers": [{"text": "TV", "points": 34}, {"text": "Clothes", "points": 25}, {"text": "Toys", "points": 17}, {"text": "Electronics", "points": 11}, {"text": "Shoes", "points": 8}, {"text": "Appliances", "points": 5}]}, {"id": 32, "category": "General", "question": "Name something that gets passed around at dinner", "answers": [{"text": "Rolls", "points": 34}, {"text": "Gravy", "points": 25}, {"text": "Salt", "points": 17}, {"text": "Potatoes", "points": 11}, {"text": "Butter", "points": 8}, {"text": "Serving bowl", "points": 5}]}, {"id": 33, "category": "General", "question": "Name something people do to stay warm in November", "answers": [{"text": "Wear sweater", "points": 34}, {"text": "Use blanket", "points": 25}, {"text": "Turn up heat", "points": 17}, {"text": "Drink cocoa", "points": 11}, {"text": "Light fire", "points": 8}, {"text": "Wear socks", "points": 5}]}, {"id": 34, "category": "General", "question": "Name something you might hear in a crowded kitchen", "answers": [{"text": "Move over!", "points": 34}, {"text": "Dinner is ready!", "points": 25}, {"text": "Where is the salt?", "points": 17}, {"text": "Hot pan!", "points": 11}, {"text": "Need help?", "points": 8}, {"text": "Set the table!", "points": 5}]}, {"id": 35, "category": "General", "question": "Name something you need to carve a turkey", "answers": [{"text": "Knife", "points": 34}, {"text": "Cutting board", "points": 25}, {"text": "Fork", "points": 17}, {"text": "Platter", "points": 11}, {"text": "Sharpener", "points": 8}, {"text": "Apron", "points": 5}]}, {"id": 36, "category": "General", "question": "Name something you might do to entertain kids at a gathering", "answers": [{"text": "Play games", "points": 34}, {"text": "Put on movie", "points": 25}, {"text": "Color", "points": 17}, {"text": "Go outside", "points": 11}, {"text": "Make crafts", "points": 8}, {"text": "Give snacks", "points": 5}]}, {"id": 37, "category": "General", "question": "Name something people talk about at a reunion", "answers": [{"text": "Work", "points": 34}, {"text": "Kids", "points": 25}, {"text": "Old memories", "points": 17}, {"text": "School", "points": 11}, {"text": "Travel", "points": 8}, {"text": "Sports", "points": 5}]}, {"id": 38, "category": "General", "question": "Name something people put on a sandwich", "answers": [{"text": "Turkey", "points": 34}, {"text": "Cheese", "points": 25}, {"text": "Lettuce", "points": 17}, {"text": "Mayonnaise", "points": 11}, {"text": "Tomato", "points": 8}, {"text": "Mustard", "points": 5}]}, {"id": 39, "category": "General", "question": "Name something you check before leaving for a trip", "answers": [{"text": "Keys", "points": 34}, {"text": "Wallet", "points": 25}, {"text": "Phone", "points": 17}, {"text": "Doors locked", "points": 11}, {"text": "Gas", "points": 8}, {"text": "Weather", "points": 5}]}, {"id": 40, "category": "General", "question": "Name something that makes a holiday meal memorable", "answers": [{"text": "Good food", "points": 34}, {"text": "Family together", "points": 25}, {"text": "Laughter", "points": 17}, {"text": "Traditions", "points": 11}, {"text": "Funny story", "points": 8}, {"text": "Dessert", "points": 5}]}, {"id": 41, "category": "Family survey", "question": "Who in our family is most likely to fall asleep after dinner?", "answers": []}, {"id": 42, "category": "Family survey", "question": "Who in our family tells the funniest stories?", "answers": []}, {"id": 43, "category": "Family survey", "question": "Who would survive the longest on a deserted island?", "answers": []}, {"id": 44, "category": "Family survey", "question": "Who is most likely to sneak dessert before dinner?", "answers": []}, {"id": 45, "category": "Family survey", "question": "Who takes the longest to get ready?", "answers": []}, {"id": 46, "category": "Family survey", "question": "Who is most competitive during family games?", "answers": []}, {"id": 47, "category": "Family survey", "question": "Who is most likely to show up with extra food?", "answers": []}, {"id": 48, "category": "Family survey", "question": "Who is most likely to start singing unexpectedly?", "answers": []}, {"id": 49, "category": "Family survey", "question": "Who would be the best host of a TV game show?", "answers": []}, {"id": 50, "category": "Family survey", "question": "What family tradition should we never skip?", "answers": []}];
-const STORE='thanksgiving-feud-v1';
+.fastcard{background:#071d49;border:2px solid #e2b451;border-radius:12px;padding:14px;margin:10px 0}.fastline{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#153b79;padding:10px;margin:6px 0;border-radius:7px}.fastline b{color:#ffd578}.fastbig{text-align:center;color:#ffd578;font-size:clamp(25px,4vw,45px);font-weight:900}.fasttotal{text-align:center;font-size:28px;font-weight:900;color:#ffd578}.fastcontrols button{margin:3px}.fastinput{max-width:95px}.fastwinner{font-size:26px;color:#ffd578;text-align:center;font-weight:900}.coinface{margin:25px auto;width:clamp(110px,20vw,220px);aspect-ratio:1;border-radius:50%;border:8px double #fff0a3;background:radial-gradient(circle at 35% 25%,#fff1a5,#d69a24 75%);color:#503000;display:grid;place-items:center;font-size:clamp(24px,5vw,52px);font-weight:900;box-shadow:0 8px 25px #0008}.coinspin{animation:coinspin .22s linear infinite}@keyframes coinspin{to{transform:rotateY(360deg)}}@media(prefers-reduced-motion:reduce){.coinspin{animation:none}}
+.hostTitle{margin:0 0 8px}
+details{margin:10px 0}
+summary{cursor:pointer;color:#ffd578}
+#category{margin:6px 0}
+#openFast,#fastAward{width:100%;margin-top:6px}
+.revealGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.revealGrid button{text-align:left;padding:7px 9px;font-size:.875rem}
+.roundBank,.boardMeta{text-align:center}
+.roundBank strong{color:#ffd578;font-size:1.4em;margin-left:.3em}
+.boardMeta{font-size:.85rem;color:#c6d7f1;margin:.65em 0 0}
+.fastEntry{margin:.6rem 0;padding:.5rem;background:#102e60;border-radius:8px}
+.fastEntry details{margin:.15rem 0}
+.fastFields{display:grid;grid-template-columns:minmax(0,1fr) minmax(4rem,6rem) auto;gap:.35rem;margin:.3rem 0}
+.fastFields input,.fastFields button{padding:.4rem}
+.fastHeader{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.fastTable{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem .6rem}
+.fastHeading{text-align:center;color:#ffd578;font-weight:800}
+.fastCell{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.4em;background:#0d326f;border:1px solid #d2a64c;border-radius:.35em;overflow:hidden;font-weight:750;padding-left:.5em}
+.fastCell span{overflow-wrap:anywhere}
+.fastCell b{color:#14233b;background:#e4b85e;align-content:center;text-align:center;min-width:2.3em;height:100%;padding:.25em}
+.fastBoard{display:grid;gap:.55rem;min-height:0}
+.tv{min-height:100dvh}
+.tv #audienceBoard{padding:2vmin}
+.tv .board{min-height:96dvh}
+.tv .fastBoard{height:96dvh;min-height:0;padding:1.5vmin;grid-template-rows:auto minmax(0,1fr) auto auto;gap:.8vmin}
+.tv .fastTable{grid-template-rows:auto repeat(5,minmax(0,1fr));font-size:clamp(14px,3.45vmin,42px);gap:.7vmin 1.2vmin;min-height:0}
+.tv .fastHeader .fastbig,.tv .fastHeader .timer,.tv .fasttotal,.tv .fastwinner{font-size:clamp(19px,4vmin,55px);line-height:1.12;margin:0}
+.tv .question{font-size:clamp(20px,4vmin,54px)}
+.tv .answer{font-size:clamp(16px,3vmin,40px)}
+.tv .team strong{font-size:clamp(28px,5vmin,76px)}
+#boardMount:fullscreen{background:#08152c;display:grid;align-items:center;padding:2vmin}
+@media(max-width:520px){.revealGrid{grid-template-columns:1fr}}
+</style></head><body><div class="wrap"><header class="header"><h1>THANKSGIVING FAMILY FEUD</h1><div class="subtitle">Classic game-night edition · Host dashboard + optional TV audience window</div></header><div class="layout"><section class="panel"><div id="boardMount"></div><div class="controls"><button onclick="openAudience()">📺 Open TV / Player Screen</button><button class="secondary" onclick="toggleSound()" id="soundBtn">🔊 Sound on</button><button class="secondary" onclick="fullScreen()">⛶ Fullscreen</button></div><div class="small">Tip: Open the player screen, drag that window to your TV, then fullscreen it. The host keeps this dashboard with the answers.</div></section><section class="panel"><h2 class="hostTitle">Host controls</h2>
+<details id="coinControls"><summary>Opening coin toss</summary><div id="coinHost"></div></details>
+<div id="liveControls">
+  <div id="familyTools" class="controls"><button class="secondary" onclick="openFamilyEditor()">Enter family survey answers</button><button class="secondary" onclick="printSurvey()">Print family survey</button></div>
+  <label for="selector">Choose any question</label>
+  <select id="selector" onchange="selectQuestion(Number(this.value))"></select>
+  <p class="small" id="category"></p>
+  <div class="controls">
+    <button class="secondary" onclick="stepQuestion(-1)">Previous question</button>
+    <button onclick="stepQuestion(1)">Next unplayed</button>
+  </div>
+  <div id="revealButtons" class="revealGrid" aria-label="Answer reveal controls"></div>
+  <div class="controls">
+    <button class="danger" id="strikeBtn" onclick="strike()">Strike</button>
+    <button class="secondary" onclick="clearStrikes()">Clear strikes</button>
+    <button class="secondary" onclick="resetRound()">Reset round</button>
+    <button class="secondary" id="markBtn" onclick="markPlayed()">Mark played</button>
+  </div>
+  <div class="controls">
+    <button id="awardA" onclick="award('A')">Award points to Team A</button>
+    <button id="awardB" onclick="award('B')">Award points to Team B</button>
+  </div>
+  <button id="openFast" onclick="startFastMoney()">Fast Money</button>
+  <details><summary>Round timer <span id="timer">30</span></summary>
+    <div class="controls"><button class="secondary" onclick="startTimer(30)">30 sec</button><button class="secondary" onclick="startTimer(60)">60 sec</button><button class="secondary" onclick="stopTimer()">Stop</button></div>
+  </details>
+</div>
+<div id="fastControls" class="hiddenui">
+  <div class="controls"><button class="secondary" onclick="endFastMoney()">Return to regular game</button></div>
+  <div id="fastHost"></div>
+</div>
+<details id="admin"><summary>Administration</summary>
+  <div class="row"><div><label for="teamA">Team A name</label><input id="teamA" oninput="state.teamA=this.value;sync()"></div><div><label for="teamB">Team B name</label><input id="teamB" oninput="state.teamB=this.value;sync()"></div></div>
+  <div class="row"><div><label for="scoreA">Adjust Team A score</label><input id="scoreA" type="number" onchange="state.scoreA=Number(this.value)||0;sync()"></div><div><label for="scoreB">Adjust Team B score</label><input id="scoreB" type="number" onchange="state.scoreB=Number(this.value)||0;sync()"></div></div>
+  <h3 id="editorHeading" tabindex="-1">Edit selected question</h3>
+  <label for="editQuestion">Question</label><textarea id="editQuestion" rows="2"></textarea>
+  <label for="editCategory">Category</label><select id="editCategory"><option>General</option><option>Family survey</option></select>
+  <label>Answers and points</label><div id="editAnswers"></div>
+  <div class="controls"><button class="secondary" onclick="addAnswer()">Add answer</button><button onclick="saveQuestion()">Save question</button></div>
+  <div id="familyNavigation" class="controls hiddenui"><button id="familyPrevious" class="secondary" onclick="stepFamilyEditor(-1)">Save and go to previous</button><button id="familyNext" class="secondary" onclick="stepFamilyEditor(1)">Save and go to next</button></div>
+  <p class="small">Family responses are stored in this browser. Keep exported backups and printed answer keys private. General and Fast Money results are simulated.</p>
+  <h3>Question bank and backup</h3>
+  <div class="controls"><button class="secondary" onclick="exportQuestions()">Export JSON backup</button><button class="secondary" onclick="byId('importFile').click()">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" class="hiddenui" onchange="importQuestions(event)"></div>
+  <div class="controls"><button class="secondary" onclick="printKey()">Print host answer key</button></div>
+  <div class="controls"><button class="danger" onclick="resetScores()">Reset game and scores</button><button class="danger" onclick="restoreDefaults()">Restore default questions</button></div>
+</details>
+</section></div></div><script>
+const DEFAULT_QUESTIONS=[
+  {"id":1,"category":"Family survey","question":"Who in our family is most likely to turn a quick trip to the store into a two-hour adventure?", "answers": []},
+  {"id":2,"category":"Family survey","question":"If you were stranded somewhere and needed rescuing, who in our family would you call first?", "answers": []},
+  {"id":3,"category":"Family survey","question":"Who in our family would be most likely to accidentally become famous?", "answers": []},
+  {"id":4,"category":"Family survey","question":"If our family competed on a survival reality show, who would be the last person standing?", "answers": []},
+  {"id":5,"category":"Family survey","question":"Who in our family is most likely to say they're not hungry and then start eating off someone else's plate?", "answers": []},
+  {"id":6,"category":"General","question":"Name an animal you might see at a farm.", "answers": [{"text":"Cow","points":32},{"text":"Pig","points":23},{"text":"Chicken","points":18},{"text":"Horse","points":12},{"text":"Sheep","points":9},{"text":"Goat","points":6}]},
+  {"id":7,"category":"General","question":"Name a sport played with a net.", "answers": [{"text":"Tennis","points":37},{"text":"Volleyball","points":29},{"text":"Basketball","points":16},{"text":"Soccer","points":8},{"text":"Badminton","points":6},{"text":"Hockey","points":4}]},
+  {"id":8,"category":"General","question":"Name an ice cream topping.", "answers": [{"text":"Chocolate syrup","points":30},{"text":"Sprinkles","points":25},{"text":"Whipped cream","points":16},{"text":"Caramel","points":11},{"text":"Cherries","points":8},{"text":"Nuts","points":6},{"text":"Cookie crumbs","points":4}]},
+  {"id":9,"category":"General","question":"Name something people bring to a movie theater.", "answers": [{"text":"Popcorn","points":46},{"text":"Drink","points":25},{"text":"Candy","points":19},{"text":"Phone","points":10}]},
+  {"id":10,"category":"General","question":"Name something people hang up for the holidays.", "answers": [{"text":"Lights","points":35},{"text":"Stockings","points":27},{"text":"Wreath","points":21},{"text":"Ornaments","points":12},{"text":"Mistletoe","points":5}]},
+  {"id":11,"category":"General","question":"Name something embarrassing that can happen when you wave at someone.", "answers": [{"text":"They were waving at someone else","points":43},{"text":"They ignore you","points":22},{"text":"You wave at a stranger","points":17},{"text":"You spill something","points":10},{"text":"You bump into someone","points":8}]},
+  {"id":12,"category":"General","question":"Name something people look for when they are already running late.", "answers": [{"text":"Keys","points":35},{"text":"Phone","points":24},{"text":"Shoes","points":14},{"text":"Wallet","points":11},{"text":"Bag","points":8},{"text":"Glasses","points":5},{"text":"Coat","points":3}]},
+  {"id":13,"category":"General","question":"Name an animal with black-and-white markings.", "answers": [{"text":"Zebra","points":42},{"text":"Panda","points":28},{"text":"Skunk","points":19},{"text":"Penguin","points":11}]},
+  {"id":14,"category":"General","question":"Name something you might eat at a baseball game.", "answers": [{"text":"Hot dog","points":44},{"text":"Peanuts","points":19},{"text":"Nachos","points":13},{"text":"Popcorn","points":10},{"text":"Pretzel","points":8},{"text":"Ice cream","points":6}]},
+  {"id":15,"category":"General","question":"Name a food you might dip in ketchup.", "answers": [{"text":"Fries","points":49},{"text":"Chicken nuggets","points":21},{"text":"Hot dog","points":13},{"text":"Burger","points":10},{"text":"Tater tots","points":7}]},
+  {"id":16,"category":"General","question":"Name a way people listen to music.", "answers": [{"text":"Phone","points":34},{"text":"Car radio","points":23},{"text":"Smart speaker","points":14},{"text":"Computer","points":10},{"text":"Record player","points":8},{"text":"TV","points":5},{"text":"Portable radio","points":4},{"text":"CD player","points":2}]},
+  {"id":17,"category":"General","question":"Name a Thanksgiving side dish.", "answers": [{"text":"Mashed potatoes","points":28},{"text":"Stuffing","points":25},{"text":"Mac and cheese","points":15},{"text":"Green beans","points":11},{"text":"Sweet potatoes","points":9},{"text":"Cranberry sauce","points":7},{"text":"Rolls","points":5}]},
+  {"id":18,"category":"General","question":"Name something a dog might drag into the house.", "answers": [{"text":"Stick","points":36},{"text":"Shoe","points":23},{"text":"Toy","points":18},{"text":"Muddy ball","points":11},{"text":"Leaf","points":7},{"text":"Sock","points":5}]},
+  {"id":19,"category":"General","question":"Name something people forget to pack for a sleepover.", "answers": [{"text":"Toothbrush","points":34},{"text":"Pajamas","points":21},{"text":"Phone charger","points":17},{"text":"Pillow","points":12},{"text":"Change of clothes","points":10},{"text":"Sleeping bag","points":6}]},
+  {"id":20,"category":"General","question":"Name an animal that lives in the ocean.", "answers": [{"text":"Shark","points":25},{"text":"Dolphin","points":21},{"text":"Whale","points":17},{"text":"Octopus","points":12},{"text":"Sea turtle","points":9},{"text":"Crab","points":7},{"text":"Jellyfish","points":5},{"text":"Seal","points":4}]},
+  {"id":21,"category":"General","question":"Name something a referee might use.", "answers": [{"text":"Whistle","points":57},{"text":"Flag","points":21},{"text":"Penalty card","points":14},{"text":"Stopwatch","points":8}]},
+  {"id":22,"category":"General","question":"Name a fruit you might put in a smoothie.", "answers": [{"text":"Banana","points":36},{"text":"Strawberry","points":25},{"text":"Blueberry","points":14},{"text":"Mango","points":11},{"text":"Pineapple","points":8},{"text":"Peach","points":6}]},
+  {"id":23,"category":"General","question":"Name something you might do during a commercial break.", "answers": [{"text":"Get a snack","points":34},{"text":"Use the bathroom","points":27},{"text":"Check your phone","points":19},{"text":"Change the channel","points":11},{"text":"Get a drink","points":9}]},
+  {"id":24,"category":"General","question":"Name something you might see in a Halloween costume contest.", "answers": [{"text":"Witch","points":25},{"text":"Ghost","points":20},{"text":"Superhero","points":16},{"text":"Zombie","points":13},{"text":"Vampire","points":10},{"text":"Pirate","points":7},{"text":"Skeleton","points":6},{"text":"Dinosaur","points":3}]},
+  {"id":25,"category":"General","question":"Name something that can make a family photo take forever.", "answers": [{"text":"Someone blinks","points":28},{"text":"Someone is missing","points":22},{"text":"Kids won't sit still","points":18},{"text":"Someone laughs","points":13},{"text":"Bad lighting","points":10},{"text":"Camera trouble","points":9}]},
+  {"id":26,"category":"General","question":"Name an animal you might see in your backyard.", "answers": [{"text":"Squirrel","points":29},{"text":"Bird","points":26},{"text":"Rabbit","points":17},{"text":"Deer","points":11},{"text":"Chipmunk","points":8},{"text":"Raccoon","points":6},{"text":"Frog","points":3}]},
+  {"id":27,"category":"General","question":"Name something people do to celebrate after scoring in a game.", "answers": [{"text":"High-five","points":34},{"text":"Dance","points":23},{"text":"Cheer","points":19},{"text":"Raise their arms","points":12},{"text":"Hug teammates","points":8},{"text":"Do a victory lap","points":4}]},
+  {"id":28,"category":"General","question":"Name a food you eat with your hands.", "answers": [{"text":"Pizza","points":27},{"text":"Sandwich","points":23},{"text":"Fried chicken","points":15},{"text":"Taco","points":12},{"text":"Burger","points":10},{"text":"Fries","points":8},{"text":"Ribs","points":5}]},
+  {"id":29,"category":"General","question":"Name something people do after Thanksgiving dinner.", "answers": [{"text":"Take a nap","points":31},{"text":"Watch football","points":26},{"text":"Eat dessert","points":19},{"text":"Wash dishes","points":12},{"text":"Take a walk","points":8},{"text":"Pack leftovers","points":4}]},
+  {"id":30,"category":"General","question":"Name something you might see at a parade.", "answers": [{"text":"Floats","points":31},{"text":"Marching band","points":24},{"text":"Dancers","points":16},{"text":"Balloons","points":12},{"text":"Classic cars","points":9},{"text":"Clowns","points":5},{"text":"Horses","points":3}]},
+  {"id":31,"category":"General","question":"Name something that would be hard to do in giant shoes.", "answers": [{"text":"Run","points":39},{"text":"Climb stairs","points":25},{"text":"Dance","points":16},{"text":"Drive","points":12},{"text":"Jump rope","points":8}]},
+  {"id":32,"category":"General","question":"Name a game kids play at recess.", "answers": [{"text":"Tag","points":28},{"text":"Hide-and-seek","points":21},{"text":"Kickball","points":17},{"text":"Four square","points":13},{"text":"Hopscotch","points":9},{"text":"Jump rope","points":7},{"text":"Basketball","points":5}]},
+  {"id":33,"category":"General","question":"Name something you would bring to a swimming pool.", "answers": [{"text":"Swimsuit","points":30},{"text":"Towel","points":25},{"text":"Sunscreen","points":18},{"text":"Goggles","points":10},{"text":"Float","points":7},{"text":"Water bottle","points":6},{"text":"Sandals","points":4}]},
+  {"id":34,"category":"General","question":"Name a pizza topping people might pick off.", "answers": [{"text":"Anchovies","points":28},{"text":"Olives","points":22},{"text":"Mushrooms","points":18},{"text":"Onions","points":12},{"text":"Pineapple","points":10},{"text":"Peppers","points":6},{"text":"Sausage","points":4}]},
+  {"id":35,"category":"General","question":"Name a character you might find in a fairy tale.", "answers": [{"text":"Princess","points":25},{"text":"Witch","points":21},{"text":"Prince","points":16},{"text":"Dragon","points":12},{"text":"Fairy","points":9},{"text":"Giant","points":7},{"text":"Wolf","points":6},{"text":"King","points":4}]},
+  {"id":36,"category":"General","question":"Name something people do at midnight on New Year's Eve.", "answers": [{"text":"Count down","points":39},{"text":"Cheer","points":22},{"text":"Hug or kiss","points":17},{"text":"Watch fireworks","points":13},{"text":"Toast","points":9}]},
+  {"id":37,"category":"General","question":"Name something you might find under a couch cushion.", "answers": [{"text":"Coins","points":33},{"text":"Crumbs","points":24},{"text":"Remote","points":18},{"text":"Toy","points":11},{"text":"Pen","points":8},{"text":"Hair tie","points":6}]},
+  {"id":38,"category":"General","question":"Name a reason someone might wear mismatched socks.", "answers": [{"text":"Got dressed in the dark","points":32},{"text":"Lost a sock","points":25},{"text":"Was in a hurry","points":19},{"text":"Did it for fun","points":15},{"text":"Laundry got mixed up","points":9}]},
+  {"id":39,"category":"General","question":"Name an animal that can be heard at night.", "answers": [{"text":"Owl","points":38},{"text":"Cricket","points":26},{"text":"Frog","points":14},{"text":"Coyote","points":12},{"text":"Cat","points":6},{"text":"Dog","points":4}]},
+  {"id":40,"category":"General","question":"Name a sport people can do on ice.", "answers": [{"text":"Ice hockey","points":41},{"text":"Figure skating","points":30},{"text":"Curling","points":17},{"text":"Speed skating","points":12}]},
+  {"id":41,"category":"General","question":"Name a food you might bring to a picnic.", "answers": [{"text":"Sandwiches","points":30},{"text":"Chips","points":22},{"text":"Fruit","points":16},{"text":"Potato salad","points":13},{"text":"Cookies","points":9},{"text":"Fried chicken","points":6},{"text":"Pasta salad","points":4}]},
+  {"id":42,"category":"General","question":"Name something you might see at a magic show.", "answers": [{"text":"Cards","points":32},{"text":"Rabbit","points":23},{"text":"Top hat","points":17},{"text":"Wand","points":12},{"text":"Assistant","points":9},{"text":"Coins","points":7}]},
+  {"id":43,"category":"General","question":"Name something you might do on a snowy day.", "answers": [{"text":"Build a snowman","points":26},{"text":"Sled","points":23},{"text":"Drink hot cocoa","points":16},{"text":"Have a snowball fight","points":13},{"text":"Shovel","points":9},{"text":"Stay inside","points":7},{"text":"Make a snow angel","points":6}]},
+  {"id":44,"category":"General","question":"Name a funny place to find a missing TV remote.", "answers": [{"text":"Refrigerator","points":29},{"text":"Bathroom","points":20},{"text":"Laundry basket","points":17},{"text":"Pet bed","points":13},{"text":"Shoe","points":10},{"text":"Trash can","points":7},{"text":"Car","points":4}]},
+  {"id":45,"category":"General","question":"Name something that makes people turn around after leaving home.", "answers": [{"text":"Forgot phone","points":31},{"text":"Forgot keys","points":23},{"text":"Door might be unlocked","points":17},{"text":"Forgot wallet","points":12},{"text":"Left a light on","points":8},{"text":"Forgot lunch","points":5},{"text":"Left something cooking","points":4}]}
+];
+const STORE='thanksgiving-feud-v4';
+const TV_STORE=STORE+'-tv';
+const byId=id=>document.getElementById(id);
+const isTV=new URLSearchParams(location.search).get('view')==='tv';
 const clone=x=>JSON.parse(JSON.stringify(x));
-let questions=clone(DEFAULT_QUESTIONS),state={index:0,teamA:'Team A',teamB:'Team B',scoreA:0,scoreB:0,strikes:0,revealed:[],roundPoints:0,awarded:false,fast:null,coin:{active:true,heads:"A",result:null,flipping:false}},soundOn=true,audience=null,timerHandle=null,timerRemaining=30;
-try{const data=JSON.parse(localStorage.getItem(STORE)||'null');if(data&&Array.isArray(data.questions)&&data.questions.length===50){questions=data.questions;state={...state,...data.state,index:Math.max(0,Math.min(49,data.state.index||0))}}}catch(e){}
+function freshRound(){return {strikes:0,revealed:[],roundPoints:0,awarded:false}}
+function freshCoin(){return {active:true,heads:'A',result:null,flipping:false}}
+let questions=clone(DEFAULT_QUESTIONS);
+let state={index:0,teamA:'Team A',teamB:'Team B',scoreA:0,scoreB:0,rounds:{},played:[],fast:null,coin:freshCoin()};
+let soundOn=true,audience=null,timerHandle=null,timerRemaining=30;
+function validBank(bank){
+  return Array.isArray(bank)&&bank.length>0&&bank.every(q=>q&&typeof q.question==='string'&&q.question.trim()
+    &&['General','Family survey'].includes(q.category)&&Array.isArray(q.answers)&&q.answers.length<=8
+    &&q.answers.every(a=>a&&typeof a.text==='string'&&a.text.trim()&&Number.isSafeInteger(a.points)&&a.points>=0));
+}
+function loadGame(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORE)||'null');
+    if(saved&&validBank(saved.questions)){
+      questions=saved.questions;
+      state={...state,...saved.state};
+      state.index=Math.min(questions.length-1,Math.max(0,Number(state.index)||0));
+      return;
+    }
+    const old=JSON.parse(localStorage.getItem('thanksgiving-feud-v1')||'null');
+    if(!old?.state)return;
+    for(const key of ['teamA','teamB','scoreA','scoreB','coin']){
+      if(old.state[key]!=null)state[key]=old.state[key];
+    }
+    // Carry over actual responses only when their prompt matches the approved survey.
+    if(Array.isArray(old.questions)){
+      for(const q of questions.filter(q=>q.category==='Family survey')){
+        const previous=old.questions.find(p=>p?.category===q.category&&p.question===q.question);
+        if(previous&&validBank([previous]))q.answers=previous.answers;
+      }
+    }
+  }catch{}
+}
+if(!isTV)loadGame();
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
 function current(){return questions[state.index]}
-function boardHtml(s,qs){if(s.coin?.active)return coinBoardHtml(s);if(s.fast?.active)return fastBoardHtml(s);const q=qs[s.index];const a=q.answers.filter(x=>x.text.trim()).slice(0,8);return `<div class="board"><div class="question">${esc(q.question)}</div><div class="answers">${a.length?a.map((v,i)=>`<div class="answer ${s.revealed.includes(i)?'':'hidden'}"><span class="num">${i+1}</span><span class="txt">${s.revealed.includes(i)?esc(v.text):'••••••••'}</span><span class="pts">${Number(v.points)||0}</span></div>`).join(''):'<div class="question">Family survey answers coming soon — host can edit this round.</div>'}</div><div class="strikes">${'✕ '.repeat(s.strikes)}</div><div class="scorebar"><div class="team">${esc(s.teamA)}<strong>${s.scoreA}</strong></div><div class="team">${esc(s.teamB)}<strong>${s.scoreB}</strong></div></div><p style="text-align:center;color:#d6e5ff;font-size:13px">Round ${s.index+1} of 50 · Revealed points: ${s.roundPoints}</p></div>`}
-function renderBoard(){document.getElementById('boardMount').innerHTML=boardHtml(state,questions);renderFastHost();renderCoinHost();document.getElementById('scoreA').value=state.scoreA;document.getElementById('scoreB').value=state.scoreB;document.getElementById('teamA').value=state.teamA;document.getElementById('teamB').value=state.teamB;document.getElementById('category').textContent=current().category+' · Question '+(state.index+1)+' of 50';document.getElementById('selector').value=state.index;document.getElementById('revealButtons').innerHTML=current().answers.filter(a=>a.text.trim()).slice(0,8).map((a,i)=>`<button style="display:block;width:100%;text-align:left;margin:5px 0" class="${state.revealed.includes(i)?'secondary':''}" onclick="reveal(${i})">${state.revealed.includes(i)?'✓':'Reveal'} ${i+1}: ${esc(a.text)} — ${Number(a.points)||0} pts</button>`).join('')||'<p class="notice">No answers yet — add the family survey results below.</p>'}
-function populateSelector(){document.getElementById('selector').innerHTML=questions.map((q,i)=>`<option value="${i}">${i+1}. ${esc(q.question)}</option>`).join('')}
-function sync(){try{localStorage.setItem(STORE,JSON.stringify({questions,state}))}catch(e){}renderBoard();if(audience&&!audience.closed)audience.postMessage({type:'FEUD_UPDATE',state,questions},'*')}
-function editLoad(){const q=current();document.getElementById('editQuestion').value=q.question;document.getElementById('editCategory').value=q.category;document.getElementById('editAnswers').innerHTML='';q.answers.forEach(a=>addAnswer(a.text,a.points))}
-function addAnswer(text='',points=0){const box=document.createElement('div');box.className='editrow';box.innerHTML=`<input aria-label="Answer" placeholder="Answer" value="${esc(text)}"><input aria-label="Points" type="number" min="0" value="${Number(points)||0}"><button class="danger" title="Remove answer" onclick="this.parentElement.remove()">×</button>`;document.getElementById('editAnswers').appendChild(box)}
-function saveQuestion(){const q=current();q.question=document.getElementById('editQuestion').value.trim()||q.question;q.category=document.getElementById('editCategory').value;q.answers=[...document.querySelectorAll('#editAnswers .editrow')].map(el=>({text:el.children[0].value.trim(),points:Math.max(0,Number(el.children[1].value)||0)})).filter(a=>a.text).slice(0,8);state.revealed=[];state.strikes=0;state.roundPoints=0;state.awarded=false;populateSelector();sync();editLoad()}
-function selectQuestion(i){state.index=Math.max(0,Math.min(49,i));state.revealed=[];state.strikes=0;state.roundPoints=0;state.awarded=false;sync();editLoad()}
-function stepQuestion(d){selectQuestion(state.index+d)}
+function round(){return state.rounds[state.index]??=freshRound()}
+function scoreHtml(){
+  return `<div class="scorebar"><div class="team">${esc(state.teamA)}<strong>${state.scoreA}</strong></div><div class="team">${esc(state.teamB)}<strong>${state.scoreB}</strong></div></div>`;
+}
+function boardHtml(){
+  if(state.coin.active)return coinBoardHtml(state);
+  if(state.fast?.active)return fastBoardHtml(state.fast);
+  const q=current(),r=round();
+  const answers=q.answers.map((a,i)=>{
+    const visible=r.revealed.includes(i);
+    return `<div class="answer ${visible?'':'hidden'}"><span class="num">${i+1}</span><span class="txt">${visible?esc(a.text):'••••••••'}</span><span class="pts">${visible?a.points:''}</span></div>`;
+  }).join('');
+  return `<div class="board"><div class="question">${esc(q.question)}</div><div class="answers">${answers||'<p class="notice">Family survey results pending</p>'}</div>
+    <div class="strikes">${'✕ '.repeat(r.strikes)}</div><div class="roundBank">Round points <strong>${r.roundPoints}</strong></div>
+    ${scoreHtml()}<p class="boardMeta">Question ${state.index+1} of ${questions.length} · ${state.played.length} rounds played</p></div>`;
+}
+function renderBoard(){
+  const markup=boardHtml();
+  if(lastBoard!==markup)byId('boardMount').innerHTML=markup;
+  lastBoard=markup;
+  const fast=!!state.fast?.active;
+  byId('liveControls').classList.toggle('hiddenui',fast);
+  byId('fastControls').classList.toggle('hiddenui',!fast);
+  byId('coinControls').classList.toggle('hiddenui',fast);
+  renderFastHost();
+  renderCoinHost();
+  for(const key of ['teamA','teamB','scoreA','scoreB']){
+    if(document.activeElement!==byId(key))byId(key).value=state[key];
+  }
+  const q=current(),r=round(),available=!state.coin.active;
+  const source=q.category==='General'?'Simulated survey':q.answers.length?'Actual family survey':'Family survey pending';
+  byId('familyTools').classList.toggle('hiddenui',!questions.some(q=>q.category==='Family survey'));
+  byId('category').textContent=source+' · Question '+(state.index+1)+' of '+questions.length+' · '+state.played.length+' played';
+  populateSelector();
+  byId('revealButtons').innerHTML=q.answers.map((a,i)=>`<button ${!available||r.revealed.includes(i)?'disabled':''} onclick="reveal(${i})">${r.revealed.includes(i)?'✓':'Reveal'} ${i+1} · ${esc(a.text)} · ${a.points}</button>`).join('')||'<p class="notice">Family survey results pending.</p>';
+  byId('strikeBtn').disabled=!available||r.strikes>=3||r.awarded;
+  byId('markBtn').disabled=!available||state.played.includes(state.index);
+  for(const team of ['A','B']){
+    const button=byId('award'+team);
+    button.textContent='Award '+r.roundPoints+' to '+state['team'+team];
+    button.disabled=!available||r.awarded||!r.roundPoints;
+  }
+}
+function populateSelector(){
+  const selector=byId('selector');
+  const options=questions.map((q,i)=>`<option value="${i}">${state.played.includes(i)?'✓ ':''}${i+1}. ${esc(q.question)}</option>`).join('');
+  if(options!==lastOptions){
+    selector.innerHTML=options;
+    lastOptions=options;
+  }
+  selector.value=state.index;
+}
+let lastBoard='',lastOptions='';
+function sync(){
+  renderBoard();
+  try{
+    localStorage.setItem(STORE,JSON.stringify({questions,state}));
+    if(localStorage.getItem(TV_STORE)!==lastBoard)localStorage.setItem(TV_STORE,lastBoard);
+  }catch{}
+  if(audience&&!audience.closed&&location.origin!=='null'){
+    audience.postMessage({type:'FEUD_UPDATE',markup:lastBoard},location.origin);
+  }
+}
+function familyQuestionIndices(){
+  return questions.flatMap((q,i)=>q.category==='Family survey'?[i]:[]);
+}
+function openFamilyEditor(){
+  const first=familyQuestionIndices()[0];
+  if(first===undefined)return;
+  selectQuestion(first);
+  byId('admin').open=true;
+  byId('editorHeading').focus();
+}
+function stepFamilyEditor(direction){
+  const indices=familyQuestionIndices();
+  const next=indices[indices.indexOf(state.index)+direction];
+  if(next!==undefined&&saveQuestion()){
+    selectQuestion(next);
+    byId('editorHeading').focus();
+  }
+}
+function editLoad(){
+  const q=current();
+  byId('editQuestion').value=q.question;
+  byId('editCategory').value=q.category;
+  byId('editAnswers').replaceChildren();
+  q.answers.forEach(a=>addAnswer(a.text,a.points));
+  const indices=familyQuestionIndices(),position=indices.indexOf(state.index);
+  const family=position>=0;
+  byId('editorHeading').textContent=family?'Family survey question '+(position+1)+' of '+indices.length:'Edit selected question';
+  byId('familyNavigation').classList.toggle('hiddenui',!family);
+  byId('familyPrevious').disabled=position<=0;
+  byId('familyNext').disabled=position<0||position>=indices.length-1;
+  if(family&&!q.answers.length)addAnswer();
+}
+function addAnswer(text='',points=0){
+  if(byId('editAnswers').children.length>=8)return;
+  const row=document.createElement('div');
+  row.className='editrow';
+  row.innerHTML=`<input aria-label="Answer" placeholder="Answer" value="${esc(text)}"><input aria-label="Points" type="number" min="0" step="1" value="${points}"><button class="danger" aria-label="Remove answer" onclick="this.parentElement.remove()">×</button>`;
+  byId('editAnswers').append(row);
+}
+function saveQuestion(){
+  const q=current();
+  const edited={...q,question:byId('editQuestion').value.trim(),category:byId('editCategory').value,
+    answers:[...byId('editAnswers').children].filter(row=>row.children[0].value.trim()).map(row=>({
+      text:row.children[0].value.trim(),points:row.children[1].valueAsNumber
+    }))};
+  if(!validBank([edited])){alert('Enter a question and whole, nonnegative points for each answer.');return false}
+  if(edited.question===q.question&&edited.category===q.category&&JSON.stringify(edited.answers)===JSON.stringify(q.answers))return true;
+  const r=round();
+  if(r.revealed.length&&!confirm('Saving clears the current board. Awarded points and played status are kept. Continue?'))return false;
+  questions[state.index]=edited;
+  state.rounds[state.index]={...freshRound(),awarded:r.awarded};
+  sync();
+  editLoad();
+  return true;
+}
+function selectQuestion(i){
+  if(!Number.isInteger(i)||i<0||i>=questions.length||i===state.index)return;
+  state.index=i;
+  stopTimer();
+  sync();
+  editLoad();
+}
+function stepQuestion(direction){
+  if(direction<0){selectQuestion(state.index-1);return}
+  for(let offset=1;offset<questions.length;offset++){
+    const i=(state.index+offset)%questions.length;
+    if(!state.played.includes(i)){selectQuestion(i);return}
+  }
+  alert('No other unplayed questions. You can revisit any question from the list.');
+}
+function markPlayed(){
+  if(state.coin.active)return;
+  if(!state.played.includes(state.index))state.played.push(state.index);
+  sync();
+}
+
 let audioContext;function sound(freq=660,duration=.18,type='sine'){if(!soundOn)return;try{audioContext??=new(window.AudioContext||window.webkitAudioContext)();const o=audioContext.createOscillator(),g=audioContext.createGain();o.type=type;o.frequency.setValueAtTime(freq,audioContext.currentTime);g.gain.setValueAtTime(.15,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);o.connect(g);g.connect(audioContext.destination);o.start();o.stop(audioContext.currentTime+duration)}catch(e){}}
-function reveal(i){if(state.coin.active){alert("Start the game after the coin toss first.");return;}if(state.revealed.includes(i))return;state.revealed.push(i);state.roundPoints+=Number(current().answers[i].points)||0;sound(830,.2);sync()}
-function strike(){if(state.coin.active){alert("Start the game after the coin toss first.");return;}state.strikes=Math.min(3,state.strikes+1);sound(145,.5,'sawtooth');sync()}
-function clearStrikes(){state.strikes=0;sync()}
-function resetRound(){state.revealed=[];state.strikes=0;state.roundPoints=0;state.awarded=false;sync()}
-function award(t){if(state.coin.active){alert("Start the game after the coin toss first.");return;}if(state.awarded){alert('This round has already been awarded. Choose the next question or reset the round.');return}if(!state.roundPoints){alert('Reveal at least one answer first.');return}state[t==='A'?'scoreA':'scoreB']+=state.roundPoints;state.awarded=true;sound(960,.35);sync()}
-function toggleSound(){soundOn=!soundOn;document.getElementById('soundBtn').textContent=soundOn?'🔊 Sound on':'🔇 Sound off'}
-function fullScreen(){const el=document.getElementById('boardMount');if(el.requestFullscreen)el.requestFullscreen()}
-function openAudience(){audience=window.open('','ThanksgivingFeudAudience','width=1150,height=850');if(!audience){alert('Allow popups for this page, then try again.');return}const styles=document.querySelector('style').textContent;audience.document.open();audience.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Thanksgiving Feud — Player Screen</title><style>${styles}body{padding:18px}.board{min-height:80vh}.question{font-size:clamp(25px,3.5vw,55px)}.answer{font-size:clamp(17px,2.3vw,30px)}.team strong{font-size:clamp(40px,5vw,85px)}.audtop{text-align:center;margin:0 0 12px;color:#ffd578}</style></head><body><h1 class="audtop">THANKSGIVING FAMILY FEUD</h1><main id="audienceBoard"></main><script>const esc=${esc.toString()};const fastTotal=${fastTotal.toString()};const coinBoardHtml=${coinBoardHtml.toString()};const fastBoardHtml=${fastBoardHtml.toString()};const boardHtml=${boardHtml.toString()};window.addEventListener('message',e=>{if(e.source!==window.opener||e.data.type!=='FEUD_UPDATE')return;document.getElementById('audienceBoard').innerHTML=boardHtml(e.data.state,e.data.questions)});window.addEventListener('keydown',e=>{if(e.key==='f')document.documentElement.requestFullscreen?.()});<\/script></body></html>`);audience.document.close();setTimeout(sync,100)}
+
+function reveal(i){
+  const r=round(),answer=current().answers[i];
+  if(state.coin.active||!answer||r.revealed.includes(i))return;
+  r.revealed.push(i);
+  r.roundPoints+=answer.points;
+  sound(830,.2);
+  sync();
+}
+function strike(){
+  const r=round();
+  if(state.coin.active||r.awarded||r.strikes>=3)return;
+  r.strikes++;
+  sound(145,.5,'sawtooth');
+  sync();
+}
+function clearStrikes(){round().strikes=0;sync()}
+function resetRound(){
+  const r=round();
+  if(!confirm('Clear revealed answers and strikes for this question? Awarded points and played status are kept.'))return;
+  state.rounds[state.index]={...freshRound(),awarded:r.awarded};
+  sync();
+}
+function award(team){
+  const r=round();
+  if(state.coin.active||r.awarded||!r.roundPoints)return;
+  state['score'+team]+=r.roundPoints;
+  r.awarded=true;
+  sound(960,.35);
+  markPlayed();
+}
+function toggleSound(){soundOn=!soundOn;byId('soundBtn').textContent=soundOn?'🔊 Sound on':'🔇 Sound off'}
+function fullScreen(){byId('boardMount').requestFullscreen?.()}
+function openAudience(){
+  if(!audience||audience.closed){
+    const url=new URL(location.href);
+    url.searchParams.set('view','tv');
+    url.hash='';
+    audience=window.open(url,'ThanksgivingFeudAudienceV4','popup,width=1280,height=720');
+  }
+  if(!audience){alert('Allow popups for this page, then try again.');return}
+  audience.focus();
+  sync();
+}
+function initTV(){
+  document.body.classList.add('tv');
+  document.body.innerHTML='<main id="audienceBoard" aria-label="Player board">Waiting for the host…</main>';
+  const show=markup=>{if(markup)byId('audienceBoard').innerHTML=markup};
+  try{show(localStorage.getItem(TV_STORE))}catch{}
+  window.addEventListener('storage',event=>{
+    if(event.key===TV_STORE)show(event.newValue);
+  });
+  window.addEventListener('message',event=>{
+    if(event.origin===location.origin&&event.source===window.opener&&event.data?.type==='FEUD_UPDATE')show(event.data.markup);
+  });
+  window.addEventListener('keydown',event=>{
+    if(event.key.toLowerCase()==='f')document.documentElement.requestFullscreen?.();
+  });
+}
 
 function startTimer(sec){stopTimer();timerRemaining=sec;updateTimer();timerHandle=setInterval(()=>{timerRemaining--;updateTimer();if(timerRemaining<=0){stopTimer();sound(160,.7,'square')}},1000)}function updateTimer(){document.getElementById('timer').textContent=timerRemaining}function stopTimer(){clearInterval(timerHandle);timerHandle=null}
 function download(name,data,type){const blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function exportQuestions(){download('thanksgiving-feud-questions-backup.json',JSON.stringify(questions,null,2),'application/json')}
-async function importQuestions(e){const file=e.target.files[0];if(!file)return;try{const v=JSON.parse(await file.text());if(!Array.isArray(v)||v.length!==50||!v.every(q=>typeof q.question==='string'&&Array.isArray(q.answers)))throw Error('Expected 50 questions');questions=v;selectQuestion(0);populateSelector();sync();alert('Imported all 50 questions.')}catch(err){alert('Import failed: '+err.message)}e.target.value=''}
+
+function replaceBank(bank){
+  if(!confirm('Replace the question bank? Team scores, Fast Money, and played status for matching questions are kept.'))return false;
+  const rounds={},played=[];
+  bank.forEach((q,i)=>{
+    const previous=questions.findIndex(item=>item.question===q.question);
+    if(previous<0)return;
+    if(state.played.includes(previous))played.push(i);
+    if(state.rounds[previous]?.awarded)rounds[i]={...freshRound(),awarded:true};
+  });
+  questions=bank;
+  state.index=0;
+  state.rounds=rounds;
+  state.played=played;
+  stopTimer();
+  sync();
+  editLoad();
+  return true;
+}
+async function importQuestions(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  try{
+    const bank=JSON.parse(await file.text());
+    if(!validBank(bank))throw new Error('Expected a nonempty question array with valid categories and up to eight scored answers per question.');
+    if(replaceBank(bank))alert('Imported '+bank.length+' questions.');
+  }catch(error){alert('Import failed: '+error.message)}
+  finally{event.target.value=''}
+}
+
 function printPage(title,body){const w=window.open('','_blank');if(!w){alert('Allow popups to print.');return}w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>body{font:16px Arial;max-width:800px;margin:35px auto;color:#111}li{margin:0 0 18px}.line{border-bottom:1px solid #aaa;height:28px}</style></head><body><h1>'+esc(title)+'</h1>'+body+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 function printSurvey(){printPage('Thanksgiving Family Survey — Keep Answers Secret','<p>Answer each question with one person or phrase. Return to the host before game day. Do not share your answers with other players.</p><p>Name (optional): __________________________</p><ol>'+questions.filter(q=>q.category==='Family survey').map(q=>'<li>'+esc(q.question)+'<div class="line"></div></li>').join('')+'</ol>')}
 function printKey(){printPage('Thanksgiving Family Feud — Host Answer Key',questions.map((q,i)=>'<h3>'+(i+1)+'. '+esc(q.question)+'</h3><ol>'+q.answers.map(a=>'<li>'+esc(a.text)+' — '+a.points+' points</li>').join('')+'</ol>').join(''))}
-function resetScores(){if(!confirm('Reset both scores and current round?'))return;state.scoreA=state.scoreB=0;state.fast=null;fastTimerStop();state.coin={active:true,heads:"A",result:null,flipping:false};resetRound()}
-function restoreDefaults(){if(!confirm('Replace ALL edits and restore the original 50 questions? Export a backup first.'))return;questions=clone(DEFAULT_QUESTIONS);state.index=0;resetRound();populateSelector();editLoad()}
+function resetScores(){
+  if(!confirm('Reset both scores, all played rounds, and Fast Money?'))return;
+  stopTimer();
+  timerRemaining=30;
+  updateTimer();
+  state={...state,index:0,scoreA:0,scoreB:0,rounds:{},played:[],fast:null,coin:freshCoin()};
+  byId('coinControls').open=true;
+  sync();
+  editLoad();
+}
+function restoreDefaults(){replaceBank(clone(DEFAULT_QUESTIONS))}
 
+
+const FAST_GOAL=200;
 const FAST_DEFAULT=[
-{q:'Name something people do immediately after Thanksgiving dinner.',a:['Take a nap','Watch football','Wash dishes','Eat dessert','Go for a walk']},
-{q:'Name a food people hope will be on the Thanksgiving table.',a:['Turkey','Mashed potatoes','Stuffing','Mac and cheese','Pumpkin pie']},
-{q:'Name something you might forget to bring to a family gathering.',a:['Dessert','Drinks','A gift','A serving dish','Your phone']},
-{q:'Name something that causes an argument during the holidays.',a:['Politics','Football','Who cooks','Money','Board games']},
-{q:'Name something people do while waiting for dinner.',a:['Snack','Watch TV','Talk','Play games','Help cook']}
+  {question:'Name something people do immediately after Thanksgiving dinner.',answers:[['Take a nap',34,'nap','sleep'],['Watch football',25,'football'],['Wash dishes',18,'do the dishes','dishes'],['Eat dessert',15,'dessert'],['Go for a walk',8,'walk']]},
+  {question:'Name a food people hope will be on the Thanksgiving table.',answers:[['Turkey',39],['Mashed potatoes',23,'mashed potato'],['Stuffing',18,'dressing'],['Mac and cheese',12,'macaroni and cheese','mac & cheese'],['Pumpkin pie',8]]},
+  {question:'Name something you might forget to bring to a family gathering.',answers:[['Dessert',28],['Drinks',24,'beverages'],['A gift',20,'gift','present'],['A serving dish',16,'serving dish'],['Your phone',12,'phone','cell phone']]},
+  {question:'Name something that causes an argument during the holidays.',answers:[['Politics',33],['Football',24],['Who cooks',18,'cooking'],['Money',14],['Board games',11,'board game']]},
+  {question:'Name something people do while waiting for dinner.',answers:[['Snack',31,'eat snacks','snacking'],['Watch TV',25,'tv','watch television'],['Talk',20,'chat','talking'],['Play games',15,'games'],['Help cook',9,'help cooking']]}
 ];
-function makeFast(){return {active:true,player:0,team:'A',step:0,show:false,awarded:false,seconds:20,rows:FAST_DEFAULT.map(x=>({question:x.q,answer1:'',answer2:'',points1:0,points2:0,reveal1:false,reveal2:false})),done:false}}
-function startFastMoney(){if(state.coin?.active){alert("Finish or skip the opening coin toss first.");return;}if(state.fast?.active&&!confirm('Restart Fast Money and erase the current Fast Money entries?'))return;stopTimer();state.fast=makeFast();sync()}
-function endFastMoney(){if(state.fast)state.fast.active=false;stopTimer();sync()}
-function fastTotal(f){return f.rows.reduce((sum,r)=>sum+(r.reveal1?Number(r.points1)||0:0)+(r.reveal2?Number(r.points2)||0:0),0)}
-function fastBoardHtml(s){const f=s.fast,who=f.player+1;return `<div class="board"><div class="fastbig">🏆 FAST MONEY</div><p style="text-align:center">Player ${who} · ${who===1?'20':'25'} second round</p><div class="fastcard">${f.rows.map((r,i)=>`<div class="fastline"><span><b>${i+1}.</b> ${esc(r.question)}</span></div><div class="fastline"><span>Player 1: ${r.reveal1?esc(r.answer1||'No answer'):'••••••••'}</span><b>${r.reveal1?Number(r.points1)||0:'?'}</b></div>${f.player===1?`<div class="fastline"><span>Player 2: ${r.reveal2?esc(r.answer2||'No answer'):'••••••••'}</span><b>${r.reveal2?Number(r.points2)||0:'?'}</b></div>`:''}`).join('')}</div><div class="fasttotal">Revealed total: ${fastTotal(f)} / 200</div>${f.done?`<div class="fastwinner">${fastTotal(f)>=200?'🎉 FAST MONEY WIN!':'Fast Money complete!'}</div>`:''}<div class="scorebar"><div class="team">${esc(s.teamA)}<strong>${s.scoreA}</strong></div><div class="team">${esc(s.teamB)}<strong>${s.scoreB}</strong></div></div></div>`}
-function renderFastHost(){const mount=document.getElementById('fastHost');if(!mount)return;const f=state.fast;if(!f?.active){mount.classList.add('hiddenui');mount.innerHTML='';return}mount.classList.remove('hiddenui');mount.innerHTML=`<div class="fastcard"><label>Winning team</label><select onchange="state.fast.team=this.value;sync()"><option value="A" ${f.team==='A'?'selected':''}>${esc(state.teamA)}</option><option value="B" ${f.team==='B'?'selected':''}>${esc(state.teamB)}</option></select><h3>Player ${f.player+1} — ${f.player===0?'20':'25'} seconds</h3><div class="timer" id="fastClock">${f.seconds}</div><div class="controls fastcontrols"><button onclick="fastTimerStart()">▶ Start timer</button><button class="secondary" onclick="fastTimerStop()">Pause</button><button class="secondary" onclick="fastTimerReset()">Reset timer</button></div><p class="small">Type the actual response and its awarded survey points. Click Reveal to show it on the TV. For repeated Player 2 answers, award zero and ask for another response.</p>${f.rows.map((r,i)=>`<div class="fastcard"><b>${i+1}. ${esc(r.question)}</b><div class="row"><input placeholder="Player ${f.player+1} answer" value="${esc(f.player===0?r.answer1:r.answer2)}" onchange="fastEdit(${i},'answer',this.value)"><input class="fastinput" type="number" min="0" placeholder="Points" value="${f.player===0?r.points1:r.points2}" onchange="fastEdit(${i},'points',this.value)"></div><div class="controls"><button class="secondary" onclick="fastReveal(${i})">${f.player===0?r.reveal1?'✓ Revealed':'Reveal answer':r.reveal2?'✓ Revealed':'Reveal answer'}</button></div></div>`).join('')}<div class="fasttotal">Total revealed: ${fastTotal(f)} / 200</div><div class="controls"><button onclick="fastNextPlayer()" ${f.player===1?'disabled':''}>→ Player 2 (25 seconds)</button><button class="secondary" onclick="fastFinish()">Show final result</button></div><button onclick="fastAward()" ${f.awarded?'disabled':''}>🏆 Add ${fastTotal(f)} Fast Money points to ${esc(f.team==='A'?state.teamA:state.teamB)}</button>${f.awarded?'<p class="notice">✓ Bonus points already added. No double scoring.</p>':''}</div>`}
-let fastInterval=null;
-function fastTimerStop(){clearInterval(fastInterval);fastInterval=null}
-function fastTimerReset(){fastTimerStop();if(!state.fast)return;state.fast.seconds=state.fast.player===0?20:25;sync()}
-function fastTimerStart(){fastTimerStop();if(!state.fast?.active)return;fastInterval=setInterval(()=>{const f=state.fast;if(!f?.active){fastTimerStop();return}f.seconds=Math.max(0,f.seconds-1);const el=document.getElementById('fastClock');if(el)el.textContent=f.seconds;if(f.seconds===0){fastTimerStop();sound(145,.7,'sawtooth')}},1000)}
-function fastEdit(i,type,value){const f=state.fast,r=f.rows[i],suffix=f.player+1;r[type+suffix]=type==='points'?Math.max(0,Number(value)||0):value;sync()}
-function fastReveal(i){const f=state.fast,r=f.rows[i];r['reveal'+(f.player+1)]=true;sound(830,.2);sync()}
-function fastNextPlayer(){fastTimerStop();const f=state.fast;f.player=1;f.seconds=25;sync()}
-function fastFinish(){fastTimerStop();state.fast.done=true;state.fast.player=1;sync();if(fastTotal(state.fast)>=200)sound(1000,.65)}
-function fastAward(){const f=state.fast;if(f.awarded)return;const points=fastTotal(f);if(!points){alert('Reveal scored answers first.');return}state[f.team==='A'?'scoreA':'scoreB']+=points;f.awarded=true;f.done=true;sound(1050,.6);sync()}
-
+function makeFast(){
+  return {active:true,player:0,team:'A',awarded:false,seconds:20,deadline:null,done:false,
+    rows:FAST_DEFAULT.map(()=>[
+      {answer:'',override:null,revealed:false},
+      {answer:'',override:null,revealed:false}
+    ])};
+}
+function startFastMoney(){
+  if(state.coin.flipping){alert('Wait for the coin toss to finish.');return}
+  state.coin.active=false;
+  state.fast??=makeFast();
+  state.fast.active=true;
+  stopTimer();
+  sync();
+}
+function endFastMoney(){
+  fastTimerStop();
+  state.fast.active=false;
+  sync();
+}
+function normalizeAnswer(text){
+  return text.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/^(a|an|the) /,'');
+}
+function keyEntry(index,text){
+  const normalized=normalizeAnswer(text);
+  return FAST_DEFAULT[index].answers.find(([answer,,...aliases])=>[answer,...aliases].some(a=>normalizeAnswer(a)===normalized));
+}
+function duplicate(row,index){
+  const first=normalizeAnswer(row[0].answer),second=normalizeAnswer(row[1].answer);
+  if(!first||!second)return false;
+  const entry=keyEntry(index,first);
+  return first===second||!!entry&&entry===keyEntry(index,second);
+}
+function fastPoints(row,index,player){
+  if(player===1&&duplicate(row,index))return 0;
+  const response=row[player];
+  if(!response.answer.trim())return 0;
+  return response.override??keyEntry(index,response.answer)?.[1]??0;
+}
+function fastTotal(f){
+  return f.rows.reduce((total,row,i)=>total+row.reduce((sum,response,player)=>sum+(response.revealed?fastPoints(row,i,player):0),0),0);
+}
+function fastBoardHtml(f){
+  const total=fastTotal(f);
+  return `<div class="board fastBoard"><header class="fastHeader"><div class="fastbig">FAST MONEY</div><div class="timer">Player ${f.player+1} · ${f.seconds}s</div></header>
+    <div class="fastTable">
+      <div class="fastHeading">Player 1</div><div class="fastHeading">Player 2</div>
+      ${f.rows.map((row,i)=>row.map((response,player)=>`<div class="fastCell"><span>${response.revealed?esc(response.answer.trim()||'No answer'):'••••••••'}</span><b>${response.revealed?fastPoints(row,i,player):'–'}</b></div>`).join('')).join('')}
+    </div>
+    <div class="fasttotal">Combined total ${total} / ${FAST_GOAL}</div>
+    ${f.done?`<div class="fastwinner">${total>=FAST_GOAL?'Fast Money win!':'Fast Money complete'}</div>`:''}
+  </div>`;
+}
+let renderedFastPlayer=null;
+function renderFastHost(){
+  const f=state.fast,mount=byId('fastHost');
+  if(!f?.active){
+    renderedFastPlayer=null;
+    return;
+  }
+  if(renderedFastPlayer!==f.player){
+    renderedFastPlayer=f.player;
+    mount.innerHTML=`
+      <h3>Player ${f.player+1}</h3>
+      <div class="timer" id="fastClock"></div>
+      <div class="controls">
+        <button id="fastStart" onclick="fastTimerStart()">Start timer</button>
+        <button class="secondary" id="fastPause" onclick="fastTimerStop();sync()">Pause</button>
+        <button class="secondary" id="fastReset" onclick="fastTimerReset()">Reset timer</button>
+      </div>
+      <p class="small">Simulated answer key. Leave points blank to use the suggested score. Repeated answers score zero.</p>
+      ${FAST_DEFAULT.map(({question,answers},i)=>`
+        <section class="fastEntry">
+          <strong>${i+1}. ${esc(question)}</strong>
+          <div class="fastFields">
+            <input id="fastAnswer${i}" placeholder="Answer" aria-label="Answer ${i+1}" maxlength="80" oninput="fastEdit(${i},'answer',this.value)">
+            <input id="fastPoints${i}" class="fastinput" type="number" min="0" max="100" step="1" aria-label="Points for answer ${i+1}" oninput="fastEdit(${i},'override',this.value)">
+            <button class="secondary" id="fastReveal${i}" onclick="fastReveal(${i})">Reveal</button>
+          </div>
+          <div class="small" id="fastHint${i}" aria-live="polite"></div>
+          <details><summary>Answer key</summary><div class="small">${answers.map(([answer,points])=>esc(answer)+' '+points).join(' · ')}</div></details>
+        </section>`).join('')}
+      <div class="fasttotal" id="fastTotal"></div>
+      <div class="controls"><button id="fastNext" onclick="fastNextPlayer()">Player 2</button><button class="secondary" id="fastFinish" onclick="fastFinish()">Show final result</button></div>
+      <label for="fastTeam">Bonus goes to</label>
+      <select id="fastTeam" onchange="state.fast.team=this.value;sync()"><option value="A"></option><option value="B"></option></select>
+      <button id="fastAward" onclick="fastAward()"></button>`;
+  }
+  byId('fastClock').textContent=f.seconds;
+  byId('fastStart').disabled=!!f.deadline||!f.seconds||f.done;
+  byId('fastPause').disabled=!f.deadline;
+  byId('fastReset').disabled=f.done;
+  f.rows.forEach((row,i)=>{
+    const response=row[f.player],answer=byId('fastAnswer'+i),points=byId('fastPoints'+i),reveal=byId('fastReveal'+i);
+    if(document.activeElement!==answer)answer.value=response.answer;
+    if(document.activeElement!==points)points.value=response.override??'';
+    points.placeholder=String(keyEntry(i,response.answer)?.[1]??0);
+    answer.disabled=points.disabled=f.awarded;
+    reveal.disabled=response.revealed||f.awarded;
+    reveal.textContent=response.revealed?'Revealed':'Reveal';
+    byId('fastHint'+i).textContent=f.player===1&&duplicate(row,i)?'Duplicate of Player 1 · 0 points':'Score: '+fastPoints(row,i,f.player);
+  });
+  const total=fastTotal(f),team=byId('fastTeam');
+  byId('fastTotal').textContent=total+' / '+FAST_GOAL;
+  byId('fastNext').disabled=f.player===1||f.done;
+  byId('fastFinish').disabled=f.done;
+  team.options[0].text=state.teamA;
+  team.options[1].text=state.teamB;
+  team.value=f.team;
+  team.disabled=f.awarded;
+  byId('fastAward').textContent=f.awarded?'Bonus awarded':'Award '+total+' bonus points';
+  byId('fastAward').disabled=f.awarded||!f.done||!total;
+}
+function fastEdit(i,field,value){
+  const f=state.fast;
+  if(f.awarded)return;
+  f.rows[i][f.player][field]=field==='override'?(value===''?null:Math.min(100,Math.max(0,Math.trunc(Number(value)||0)))):value;
+  sync();
+}
+function fastReveal(i){
+  const f=state.fast,response=f.rows[i][f.player];
+  if(f.awarded||response.revealed)return;
+  response.revealed=true;
+  sound(830,.2);
+  sync();
+}
+function fastTimerStop(){
+  const f=state.fast;
+  if(f?.deadline){
+    f.seconds=Math.max(0,Math.ceil((f.deadline-Date.now())/1000));
+    f.deadline=null;
+  }
+}
+function fastTimerReset(){
+  const f=state.fast;
+  if(f.done)return;
+  fastTimerStop();
+  f.seconds=f.player===0?20:25;
+  sync();
+}
+function fastTimerStart(){
+  const f=state.fast;
+  if(!f?.active||f.deadline||!f.seconds||f.done)return;
+  f.deadline=Date.now()+f.seconds*1000;
+  sync();
+}
+function tickFastTimer(){
+  const f=state.fast;
+  if(!f?.active||!f.deadline)return;
+  const remaining=Math.max(0,Math.ceil((f.deadline-Date.now())/1000));
+  if(remaining===f.seconds&&remaining>0)return;
+  f.seconds=remaining;
+  if(!remaining){
+    f.deadline=null;
+    sound(145,.7,'sawtooth');
+  }
+  sync();
+}
+function fastNextPlayer(){
+  const f=state.fast;
+  if(f.player===1||f.done)return;
+  fastTimerStop();
+  f.player=1;
+  f.seconds=25;
+  sync();
+}
+function fastFinish(){
+  const f=state.fast;
+  if(f.done)return;
+  fastTimerStop();
+  f.done=true;
+  if(fastTotal(f)>=FAST_GOAL)sound(1000,.65);
+  sync();
+}
+function fastAward(){
+  const f=state.fast,points=fastTotal(f);
+  if(f.awarded||!f.done||!points)return;
+  state['score'+f.team]+=points;
+  f.awarded=true;
+  sound(1050,.6);
+  sync();
+}
 
 function coinBoardHtml(s){const c=s.coin;const heads=c.heads==='A'?s.teamA:s.teamB,tails=c.heads==='A'?s.teamB:s.teamA;const winner=c.result==='Heads'?heads:tails;return `<div class="board" style="text-align:center"><div class="fastbig">OPENING COIN TOSS</div><p style="font-size:22px">Heads: ${esc(heads)} &nbsp; | &nbsp; Tails: ${esc(tails)}</p><div class="coinface ${c.flipping?'coinspin':''}">${c.flipping?'★':esc(c.result||'?')}</div><div class="fastbig">${c.flipping?'Flipping…':c.result?esc(winner)+' goes first!':'Who will go first?'}</div><div class="scorebar"><div class="team">${esc(s.teamA)}<strong>${s.scoreA}</strong></div><div class="team">${esc(s.teamB)}<strong>${s.scoreB}</strong></div></div></div>`}
 function renderCoinHost(){const c=state.coin,m=document.getElementById('coinHost');if(!c.active){m.innerHTML=`<p class="small">${c.result?'Opening winner: '+esc(c.result==='Heads'?(c.heads==='A'?state.teamA:state.teamB):(c.heads==='A'?state.teamB:state.teamA)):'Coin toss skipped'}</p><button class="secondary" onclick="openCoin()">Open coin toss</button>`;return}m.innerHTML=`<label>Heads belongs to</label><select ${c.flipping||c.result?'disabled':''} onchange="state.coin.heads=this.value;sync()"><option value="A" ${c.heads==='A'?'selected':''}>${esc(state.teamA)}</option><option value="B" ${c.heads==='B'?'selected':''}>${esc(state.teamB)}</option></select><div class="controls"><button onclick="flipCoin()" ${c.flipping||c.result?'disabled':''}>🪙 Flip coin</button><button onclick="closeCoin()" ${c.flipping?'disabled':''}>${c.result?'Start game':'Skip toss'}</button></div>`}
 function openCoin(){if(state.fast?.active){alert('Return to regular game first.');return}state.coin={active:true,heads:'A',result:null,flipping:false};sync()}
 function closeCoin(){if(state.coin.flipping)return;state.coin.active=false;sync()}
 function flipCoin(){const c=state.coin;if(!c.active||c.flipping||c.result)return;c.flipping=true;sound(440,.2);sync();setTimeout(()=>{if(state.coin!==c)return;const random=new Uint32Array(1);crypto.getRandomValues(random);c.result=random[0]%2?'Heads':'Tails';c.flipping=false;sound(960,.4);sync()},1400)}
-state.coin.flipping=false;
+if(isTV){
+  initTV();
+}else{
+  state.coin.flipping=false;
+  byId('coinControls').open=state.coin.active;
+  sync();
+  editLoad();
+  tickFastTimer();
+  setInterval(tickFastTimer,200);
+}
 
-populateSelector();sync();editLoad();
+
 </script></body></html>
